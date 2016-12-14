@@ -1,15 +1,19 @@
 package com.startapp.messaging
 
+import java.util.concurrent.TimeUnit
+
 import akka.actor.{Actor, ActorRef, Props}
+import akka.util.Timeout
+
+import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by Sidney on 01/12/2016.
   */
 class CPUActorRoute(val fillAmount: Int, val instancesAmount: Int) extends Actor {
-
-  implicit val ec =
   var processedMessages: Int = 0
+  implicit val timeout = new FiniteDuration(5, TimeUnit.SECONDS)
 
   def receive = {
 
@@ -25,7 +29,8 @@ class CPUActorRoute(val fillAmount: Int, val instancesAmount: Int) extends Actor
       processedMessages += 1
       if (processedMessages % 500 == 0) println(s"Processing 1 message took ${System.currentTimeMillis() - ts} ms")
 
-      context.system.actorSelection("/manager/counter") ! SuccessMessageProcess(instancesAmount, fillAmount)
+      //val actorRef = Await.result(context.system.actorSelection("/manager/counterActor").resolveOne(timeout), timeout)
+      context.system.actorSelection(s"/user/manager/counter-$fillAmount")! SuccessMessageProcess(instancesAmount, fillAmount)
     }
 
 

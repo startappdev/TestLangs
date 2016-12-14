@@ -11,7 +11,6 @@ class CounterActor(var fillAmount: Int, var instancesAmount: Int) extends Actor 
   // Counter counts only per instance of fillAmount and instancesAmount
   var counter = 0
   var ts = System.currentTimeMillis
-
   def receive = {
 
     case SuccessMessageProcess(nInstanceAmount, nFillAmount) => {

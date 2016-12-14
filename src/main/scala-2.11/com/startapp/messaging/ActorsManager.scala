@@ -1,10 +1,8 @@
 package com.startapp.messaging
 
-import java.util.Date
-
 import akka.actor.Actor.Receive
 import akka.actor.{Actor, ActorRef, Props}
-import akka.routing.{DefaultResizer, OptimalSizeExploringResizer, Resizer, SmallestMailboxPool}
+import akka.routing.SmallestMailboxPool
 
 import scala.collection.mutable
 import scala.concurrent.duration._
@@ -18,20 +16,19 @@ class ActorsManager(val initialInstances: Int, val initialFillAmount: Int, val i
   val actors: mutable.HashMap[Int, ActorRef] = new mutable.HashMap[Int, ActorRef]()
 
   var currentCPUActor: ActorRef = _
+  var currentCounterActor: ActorRef = _
   var ts = System.currentTimeMillis()
 
   var sodaMsgArray: SodaMsgArray = _
   var actorName: String = _
 
   for (fillAmount <- 1 to 21 by 5) {
-      actorName = s"cpuActor-$fillAmount"
+    for (instances <- List(1, 3, 5, 10, 20)) {
+      actorName = s"cpuActor-$instances-$fillAmount"
       println(s"Creating actor $actorName")
 
-      val resizer: Resizer = DefaultResizer(1, 10, backoffThreshold = 0.3, backoffRate = 0.1, messagesPerResize = 500)
+      currentCounterActor = context.actorOf(SmallestMailboxPool(instances).props(Props(classOf[CounterActor], fillAmount, instances)), name = s"counterActor-$instances-$fillAmount")
 
-      currentCPUActor = context.actorOf(
-        SmallestMailboxPool(1, resizer = Some(resizer)).props(Props(classOf[CPUActorRoute], fillAmount, 1)), name = s"counterActor-$fillAmount")
-      val d = new Date(43200000)
       val sodaMsg = SodaMsg("Hola", 3)
       //counterActor ! Reset(instances, fillAmount)
 
@@ -40,12 +37,13 @@ class ActorsManager(val initialInstances: Int, val initialFillAmount: Int, val i
       while (System.currentTimeMillis - ts < 1000 * 60 * intervalInMinutes) {
         // Run for an hour
         //sodaMsgArray.sodaArray.foreach(x => currentActor ! (x, instances, fillAmount))
-        lst.foreach(sodaMsg => currentCPUActor ! (sodaMsg, 1, fillAmount))
+        lst.foreach(sodaMsg => currentCPUActor ! (sodaMsg, instances, fillAmount))
         Thread.sleep(10)
       }
       println(s"Killing actor $actorName")
       context.stop(currentCPUActor) // Kill CPU actor
       Thread.sleep(1000 * 3)
+    }
   }
 
   def receive = {

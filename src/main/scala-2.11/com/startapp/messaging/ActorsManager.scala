@@ -15,8 +15,6 @@ import scala.concurrent.duration._
 class ActorsManager(val initialInstances: Int, val initialFillAmount: Int, val intervalInMinutes: Int) extends Actor {
 
   implicit val executionContext = scala.concurrent.ExecutionContext.Implicits.global
-  val actors: mutable.HashMap[Int, ActorRef] = new mutable.HashMap[Int, ActorRef]()
-
   var currentCPUActor: ActorRef = _
   var ts = System.currentTimeMillis()
 
@@ -24,28 +22,31 @@ class ActorsManager(val initialInstances: Int, val initialFillAmount: Int, val i
   var actorName: String = _
 
   for (fillAmount <- 1 to 21 by 5) {
-      actorName = s"cpuActor-$fillAmount"
-      println(s"Creating actor $actorName")
+    actorName = s"cpuActor-$fillAmount"
+    println(s"Creating actor $actorName")
 
-      val resizer: Resizer = DefaultResizer(1, 10, backoffThreshold = 0.3, backoffRate = 0.1, messagesPerResize = 500)
+    val resizer: Resizer = DefaultResizer(1, 10, backoffThreshold = 0.3, backoffRate = 0.1, messagesPerResize = 500)
 
-      currentCPUActor = context.actorOf(
-        SmallestMailboxPool(1, resizer = Some(resizer)).props(Props(classOf[CPUActorRoute], fillAmount, 1)), name = s"counterActor-$fillAmount")
-      val d = new Date(43200000)
-      val sodaMsg = SodaMsg("Hola", 3)
-      //counterActor ! Reset(instances, fillAmount)
+    currentCPUActor = context.actorOf(
+      SmallestMailboxPool(1, resizer = Some(resizer)).props(Props(classOf[CPUActorRoute], fillAmount, 1)), name = s"counterActor-$fillAmount"
+    )
+    var currentCounterActor: ActorRef = context.actorOf(Props(classOf[CounterActor], fillAmount, 1), name=s"counter-$fillAmount")
+    context.system.scheduler.schedule(5 seconds, 2 seconds, currentCounterActor, PrintInfo)
+    val sodaMsg = SodaMsg("Hola", 3)
+    //counterActor ! Reset(instances, fillAmount)
 
-      ts = System.currentTimeMillis
-      val lst: List[SodaMsg] = List.fill(fillAmount)(sodaMsg)
-      while (System.currentTimeMillis - ts < 1000 * 60 * intervalInMinutes) {
-        // Run for an hour
-        //sodaMsgArray.sodaArray.foreach(x => currentActor ! (x, instances, fillAmount))
-        lst.foreach(sodaMsg => currentCPUActor ! (sodaMsg, 1, fillAmount))
-        Thread.sleep(10)
-      }
-      println(s"Killing actor $actorName")
-      context.stop(currentCPUActor) // Kill CPU actor
-      Thread.sleep(1000 * 3)
+    ts = System.currentTimeMillis
+    val lst: List[SodaMsg] = List.fill(fillAmount)(sodaMsg)
+    while (System.currentTimeMillis - ts < 1000 * 60 * intervalInMinutes) {
+      // Run for an hour
+      //sodaMsgArray.sodaArray.foreach(x => currentActor ! (x, instances, fillAmount))
+      lst.foreach(sodaMsg => currentCPUActor ! (sodaMsg, 1, fillAmount))
+      Thread.sleep(10)
+    }
+    println(s"Killing actor $actorName")
+    context.stop(currentCPUActor) // Kill CPU actor
+    context.stop(currentCounterActor)
+    Thread.sleep(1000 * 3)
   }
 
   def receive = {

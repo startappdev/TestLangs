@@ -7,10 +7,9 @@ import scala.collection.mutable
 /**
   * Created by Sidney on 01/12/2016.
   */
-class CounterActor(val fillAmount: Int, val instancesAmount: Int) extends Actor {
+class CounterActor(var fillAmount: Int, var instancesAmount: Int) extends Actor {
   // Counter counts only per instance of fillAmount and instancesAmount
   var counter = 0
-
   var ts = System.currentTimeMillis
 
   def receive = {
@@ -21,6 +20,13 @@ class CounterActor(val fillAmount: Int, val instancesAmount: Int) extends Actor 
     case PrintInfo => {
       val timeElapsed = System.currentTimeMillis() - ts
         println(s"$fillAmount:$instancesAmount:$timeElapsed:$counter")
+    }
+
+    case Reset(nInstancesAmount, nFillAmount) => {
+      counter = 0
+      ts = System.currentTimeMillis
+      fillAmount = nFillAmount
+      instancesAmount = nInstancesAmount
     }
 
     case x => println(s"Unknown - $x")

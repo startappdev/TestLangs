@@ -8,9 +8,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   */
 class CPUActorRoute(val fillAmount: Int, val instancesAmount: Int) extends Actor {
 
-  val counterActor = context.actorOf(Props(classOf[CounterActor], fillAmount, instancesAmount), name=s"counterActor-$instancesAmount-$fillAmount")
   implicit val ec =
-  context.system.scheduler.schedule(5 seconds, 2 seconds, counterActor, PrintInfo)
   var processedMessages: Int = 0
 
   def receive = {
@@ -27,7 +25,7 @@ class CPUActorRoute(val fillAmount: Int, val instancesAmount: Int) extends Actor
       processedMessages += 1
       if (processedMessages % 500 == 0) println(s"Processing 1 message took ${System.currentTimeMillis() - ts} ms")
 
-      counterActor ! SuccessMessageProcess(instancesAmount, fillAmount)
+      context.system.actorSelection("/manager/counter") ! SuccessMessageProcess(instancesAmount, fillAmount)
     }
 
 

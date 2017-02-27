@@ -1,6 +1,8 @@
 package com.startapp.etl.detectlang
 
 import com.mzsanford.cld._
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 /**
   * Created by Sidney on 27/02/2017.
@@ -17,7 +19,7 @@ object CLD {
         // getProbableLocale returns a java.util.Locale
         Some(result.getProbableLocale.toLanguageTag)
       } else {
-        result.getCandidates.sortBy(_.getScore).reverse.head.toLanguageTag
+        result.getCandidates.asScala.sortBy(_.getScore).reverse.head.toLanguageTag
       }
     }
   }

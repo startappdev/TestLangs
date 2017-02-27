@@ -1,0 +1,2 @@
+import AssemblyKeys._
+assemblySettings

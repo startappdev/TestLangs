@@ -44,10 +44,10 @@ object Main extends App {
   }
 
   def mainStressTestLanguageDetection(args: Array[String]): Unit = {
-    val pathToCsv = args.length match {
-      case 0 => scala.io.StdIn.readLine("Enter path to csv with texts: ")
-      case _ => args.head
-    }
+    val pathToCsv = scala.io.StdIn.readLine("Enter path to csv with texts: ")
+    val testNames = args.map(_.toLowerCase)
+
+
 
     val inputs = getInputIterator(pathToCsv, skipHeader = true)
 
@@ -62,6 +62,7 @@ object Main extends App {
       TestLib("LanguageDetector", LanguageDetector.detectAnyLength),
       TestLib("CLD", CLD.detect)
     )
+      .filter(test => args.contains(test.testName.toLowerCase))
 
     tests.foreach(test => testLangFunc(inputs, bw, test))
     bw.close()

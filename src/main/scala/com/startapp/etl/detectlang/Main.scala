@@ -62,7 +62,6 @@ object Main extends App {
       TestLib("LanguageDetector", LanguageDetector.detectAnyLength),
       TestLib("CLD", CLD.detect)
     )
-      .filter(test => args.contains(test.testName.toLowerCase))
 
     tests.foreach(test => testLangFunc(inputs, bw, test))
     bw.close()

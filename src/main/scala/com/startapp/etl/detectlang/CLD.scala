@@ -1,6 +1,6 @@
 package com.startapp.etl.detectlang
 
-//import com.mzsanford.cld._
+import com.mzsanford.cld._
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
@@ -9,11 +9,10 @@ import scala.collection.JavaConverters._
   */
 object CLD {
 
-  //val compactLanguageDetector = new CompactLanguageDetector()
+  val compactLanguageDetector = new CompactLanguageDetector()
 
   def detect(text: String): Option[String] = {
-    None
-    /*if (text == null) None
+    if (text == null) None
     else {
       val result = compactLanguageDetector.detect(text)
       if (result.isReliable()) {
@@ -22,7 +21,7 @@ object CLD {
       } else {
         Some(result.getCandidates.asScala.sortBy(_.getScore).reverse.head.getLocale.toLanguageTag)
       }
-    }*/
+    }
   }
 
 }

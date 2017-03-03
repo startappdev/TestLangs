@@ -23,8 +23,7 @@ public class JavaCLD {
         else {
             List<LanguageDetectionCandidate> candidates = result.getCandidates();
             if (candidates == null) return Optional.empty();
-            Collections.sort(candidates, Comparator.comparingDouble(x -> x.getScore()));
-            return Optional.of(candidates.get(candidates.size() - 1).getLocale().toLanguageTag());
+            return Optional.of(candidates.get(0).getLocale().toLanguageTag());
         }
     }
 }

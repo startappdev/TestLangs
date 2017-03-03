@@ -14,14 +14,15 @@ public class JavaCLD {
     private static CompactLanguageDetector compactLanguageDetector = new CompactLanguageDetector();
 
     public static Optional<String> detect(String text) {
-        System.out.println(text);
+//        System.out.println(text);
         if (text == null) return Optional.empty();
         LanguageDetectionResult result = compactLanguageDetector.detect(text);
-        System.out.println(result);
-        System.out.println("-----------------------------");
+        /*System.out.println(result);
+        System.out.println("-----------------------------");*/
         if (result.isReliable()) return Optional.of(result.getProbableLocale().toLanguageTag());
         else {
             List<LanguageDetectionCandidate> candidates = result.getCandidates();
+            if (candidates == null)
             Collections.sort(candidates, Comparator.comparingDouble(x -> x.getScore()));
             return Optional.of(candidates.get(candidates.size() - 1).getLocale().toLanguageTag());
         }

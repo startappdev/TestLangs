@@ -1,6 +1,7 @@
 package com.startapp.etl.detectlang
 
 import java.io.{BufferedWriter, File, FileWriter}
+import java.util.Optional
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
@@ -57,12 +58,17 @@ object Main extends App {
     val file = new File(outputPath)
     val bw = new BufferedWriter(new FileWriter(file))
 
-    val tests: Seq[TestLib] = Seq(
-      TestLib("LangDetection", LangDetection.detect),
-      TestLib("LanguageDetector", LanguageDetector.detectAnyLength),
-      TestLib("CLD", CLD.detect)
-    )
+    implicit def javaOptToScala[T](opt: Optional[T]): Option[T] ={
+      if (opt.isPresent) Some(opt.get())
+      else None
+    }
 
+    val tests: Seq[TestLib] = Seq(
+      TestLib("JavaCLD", JavaCLD.detect),
+      TestLib("LangDetection", LangDetection.detect),
+      TestLib("LanguageDetector", LanguageDetector.detectAnyLength)
+    )
+    
     tests.foreach(test => testLangFunc(inputs, bw, test))
     bw.close()
   }

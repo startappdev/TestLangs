@@ -5,8 +5,12 @@ import com.mzsanford.cld.*;
 import java.util.Comparator;
 import java.util.Optional;
 
-*
+/**
+ *
  * Created by Sidney on 03/03/2017.
+ *
+ */
+
 
 
 public class JavaCLD {

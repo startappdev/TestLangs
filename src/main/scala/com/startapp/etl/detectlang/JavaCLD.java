@@ -2,6 +2,7 @@ package com.startapp.etl.detectlang;
 
 import com.mzsanford.cld.*;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Optional;
 
@@ -10,12 +11,9 @@ import java.util.Optional;
  * Created by Sidney on 03/03/2017.
  *
  */
-
-
-
 public class JavaCLD {
 
-    CompactLanguageDetector compactLanguageDetector = new CompactLanguageDetector();
+    private static CompactLanguageDetector compactLanguageDetector = new CompactLanguageDetector();
 
     public static Optional<String> detect(String text) {
         if (text == null) return Optional.empty();
@@ -23,7 +21,7 @@ public class JavaCLD {
         if (result.isReliable()) return Optional.of(result.getProbableLocale().toLanguageTag());
         else {
             List<LanguageDetectionCandidate> candidates = result.getCandidates();
-            Collections.sort(candidates, Comparator.comparingInt(x -> x.getScore()));
+            Collection.sort(candidates, Comparator.comparingInt(x -> x.getScore()));
             return Optional.of(candidates.get(candidates.size() - 1).getLocale().toLanguageTag());
         }
     }

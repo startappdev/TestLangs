@@ -19,7 +19,7 @@ public class JavaCLD {
         if (result.isReliable()) return Optional.of(result.getProbableLocale().toLanguageTag());
         else {
             List<LanguageDetectionCandidate> candidates = result.getCandidates();
-            Collections.sort(candidates, Comparator.comparingInt(x -> x.getScore()));
+            Collections.sort(candidates, Comparator.comparingDouble(x -> x.getScore()));
             return Optional.of(candidates.get(candidates.size() - 1).getLocale().toLanguageTag());
         }
     }

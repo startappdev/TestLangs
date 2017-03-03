@@ -8,7 +8,6 @@ scalaVersion := "2.11.8"
 
 mainClass in Global := Some("com.startapp.etl.detectlang.Main")
 
-
 resolvers ++= Seq(
   "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
   "maven" at "http://repo1.maven.org/maven2",

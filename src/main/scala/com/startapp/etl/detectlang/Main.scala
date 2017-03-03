@@ -64,7 +64,7 @@ object Main extends App {
     }
 
     val tests: Seq[TestLib] = Seq(
-      TestLib("JavaCLD", JavaCLD.detect),
+      TestLib("JavaCLD", CLD.detect),
       TestLib("LangDetection", LangDetection.detect),
       TestLib("LanguageDetector", LanguageDetector.detectAnyLength)
     )

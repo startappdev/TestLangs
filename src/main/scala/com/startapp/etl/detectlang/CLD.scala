@@ -19,7 +19,9 @@ object CLD {
         // getProbableLocale returns a java.util.Locale
         Some(result.getProbableLocale.toLanguageTag)
       } else {
-        Some(result.getCandidates.asScala.sortBy(_.getScore).last.getLocale.toLanguageTag)
+        val candidates = result.getCandidates
+        if (candidates == null) None
+        else Some(candidates.asScala.head.getLocale.toLanguageTag)
       }
     }
   }

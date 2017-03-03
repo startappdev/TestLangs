@@ -11,7 +11,7 @@ import scala.io.Source
   */
 object Main extends App {
   case class DetectionInput(id: Int, domain: String, text: String)
-  case class TestLib(testName: String, func: String => Option[String])
+  case class TestLib(testName: String, func: String => Option[String], lang: String = "scala")
 
   def splitExt(filePath: String): (String, String) = {
     val parts = filePath.split("\\.")
@@ -39,7 +39,7 @@ object Main extends App {
       startTime = System.nanoTime()
       val lang = testLib.func(inputLine.text)
       endTimeMs = (System.nanoTime() - startTime).toDouble / 1000000
-      outputLine = Seq("scala", lang.getOrElse(""), f"$endTimeMs%.10f", testLib.testName, inputLine.id, inputLine.domain, inputLine.text.replaceAll("[,\"]", "|"))
+      outputLine = Seq(testLib.lang, lang.getOrElse(""), f"$endTimeMs%.10f", testLib.testName, inputLine.id, inputLine.domain, inputLine.text.replaceAll("[,\"]", "|"))
       outputWriter.write(s"${outputLine.mkString(",")}\n")
     }
   }
@@ -64,7 +64,8 @@ object Main extends App {
     }
 
     val tests: Seq[TestLib] = Seq(
-      TestLib("JavaCLD", JavaCLD.detect),
+      TestLib("JavaCLD", JavaCLD.detect, lang = "java"),
+      TestLib("ScalaCLD", CLD.detect),
       TestLib("LangDetection", LangDetection.detect),
       TestLib("LanguageDetector", LanguageDetector.detectAnyLength)
     )
